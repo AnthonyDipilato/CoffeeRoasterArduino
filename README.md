@@ -28,4 +28,29 @@ This project involves electricity, propane, and fire.
 I will not be held liable damages and/or injuries resulting from the use of this code or from copying this project.
 
 Required libraries
-Adafruit Max31855 library
+- Adafruit Max31855 library
+
+Commands
+
+| Code 	| Item 				|
+| --- 	| --- 				|	 
+| 0	|	Status 			|
+| 1	|	Relay on 		|
+| 2	|	Relay off 		|
+| 3	|	Set proportional valve 	|
+
+Addresses
+
+| Address 	| Item 				|
+| --- 		| --- 				|
+| 0		|	All 			|
+| 1		|	Drum Temperature 	|
+| 2		|	Chamber Temperature 	|
+| 3		|	Exhaust Temperature	|
+| 4		|	Flame Status		|
+| 5		|	Drum Relay		|
+| 6		|	Cooling Relay		|
+| 7		|	Exhaust Relay		|
+| 8		|	Gas Relay		|
+| 9		|	Ignitor			|
+| 10		|	Proportional Valve	|
