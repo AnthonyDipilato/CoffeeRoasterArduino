@@ -37,13 +37,14 @@ Roast::Roast(int test){
 void Roast::setProValve(int percent){
     if(percent > 100){ percent = 100;}
     if(percent < 0){ percent = 0;}
-    proPercent = percent;
-    // input is percentage so we will convert it to 0-255 byte
-    float value = (((float) percent / 100) * 255);
-    // if value is lower than min but not 0 we will set to min
-    if(value < PWM_MIN && value != 0){
-      value = PWM_MIN;
+    if(percent == 0){
+      value = 0;
+    }else{
+      // input is percentage so we will convert it to 0-255 byte
+      int minOffset = 255 - PWM_MIN;
+      float value = (((float) percent / 100) * minOffset) + PWM_MIN;
     }
+    proPercent = percent;
     proValve = (byte) value;
     analogWrite(PRO_VALVE,   proValve);
 }

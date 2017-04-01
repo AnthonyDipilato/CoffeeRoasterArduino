@@ -32,7 +32,9 @@
 #define THERMO_CHAMBER_SO     39
 // Proportional Valve
 #define PRO_VALVE             11
-#define PWM_MIN               40       // Minimum gas setting before flame goes out, used to minimize the chance of flame out.
+// Minimum gas setting before flame goes out, used to minimize the chance of flame out.
+// !80% PWM is lowest so a value of 
+ #define PWM_MIN               200     
 
 // Flame Safety Settings
 #define IGNITION_TIME         5000     // How long to run ignitor to ignite flame (ms)
