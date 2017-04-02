@@ -15,8 +15,7 @@
 #define RELAY_GAS             5
 #define RELAY_IGNITOR         6
 // Flame Sensors
-#define FLAME_SENSOR_L        A0
-#define FLAME_SENSOR_R        A1
+#define FLAME_SENSOR        A1
 // Thermos
 // Drum
 #define THERMO_DRUM_CLK       31
@@ -37,9 +36,10 @@
  #define PWM_MIN               200     
 
 // Flame Safety Settings
+#define FLAME_SENSOR_BYPASS   true
 #define IGNITION_TIME         5000     // How long to run ignitor to ignite flame (ms)
 #define FLAME_READS           10       // Flame sensor number of reads for smoothing
-#define FLAME_THRESHOLD       255       // Lower threshold above off value to detect flame
+#define FLAME_THRESHOLD       10       // Lower threshold above off value to detect flame
 // MAX6675 is limited by read speed so we will use a delay
 #define TEMP_DELAY            500
 #define FLAME_DELAY           500

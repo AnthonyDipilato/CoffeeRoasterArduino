@@ -53,8 +53,7 @@ void setup() {
     pinMode(RELAY_IGNITOR,  OUTPUT);
     pinMode(PRO_VALVE,      OUTPUT);
     // Flame sensors
-    pinMode(FLAME_SENSOR_L, INPUT);
-    pinMode(FLAME_SENSOR_R, INPUT);
+    pinMode(FLAME_SENSOR, INPUT);
     // Initialize relays (HIGH is off)
     digitalWrite(RELAY_DRUM,    HIGH);
     digitalWrite(RELAY_COOLING, HIGH);
@@ -136,7 +135,7 @@ void readCommand(){
           {
             if(value == 0){
               // loop through addresses to output all
-              for(int i=1; i<=10; i++){
+              for(int i=1; i<=11; i++){
                 getStatus(i);
               }
             }else{
@@ -218,6 +217,9 @@ void getStatus(int item){
             break;
         case(10):
             value = (int) roast.proPercent;
+            break;
+        case(11):
+            value = (int) roast.flameSensor;
             break;
     }
     sprintf(output,"0,%d,%d",item,value);

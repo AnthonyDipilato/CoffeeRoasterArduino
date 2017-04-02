@@ -18,8 +18,7 @@ MAX6675 drum_thermo(THERMO_DRUM_CLK, THERMO_DRUM_CS, THERMO_DRUM_SO);
 Roast::Roast(int test){
     // first we will get fire sensor readings
     // this will calibrate our off threshold since outside lighting will alter the reading
-    flameR = 0;
-    flameL = 0;
+    flameSensor = 0;
     lastCheck = 0;
     lastCheckFlame = 0;
     proValve = 0;
@@ -35,6 +34,7 @@ Roast::Roast(int test){
 }
 
 void Roast::setProValve(int percent){
+    float value;
     if(percent > 100){ percent = 100;}
     if(percent < 0){ percent = 0;}
     if(percent == 0){
@@ -42,7 +42,7 @@ void Roast::setProValve(int percent){
     }else{
       // input is percentage so we will convert it to 0-255 byte
       int minOffset = 255 - PWM_MIN;
-      float value = (((float) percent / 100) * minOffset) + PWM_MIN;
+      value = (((float) percent / 100) * minOffset) + PWM_MIN;
     }
     proPercent = percent;
     proValve = (byte) value;
@@ -79,31 +79,28 @@ void Roast::toggleRelay(int relay, boolean state){
 
 // Update Flamer Sensor readings
 void Roast::updateFlameSensors(){
-    int flameTotalL = 0;
-    int flameTotalR = 0;
+    int flameTotal = 0;
     if(millis() > (lastCheckFlame + FLAME_DELAY)){
         // loop of reads for smoothing
         for(int i=0; i<FLAME_READS; i++){
-            flameTotalL += analogRead(FLAME_SENSOR_L);
-            flameTotalR += analogRead(FLAME_SENSOR_R);
+            flameTotal += analogRead(FLAME_SENSOR);
         }
         // convert to byte 0-255 also rounds value
-        flameR = byte(flameTotalR / FLAME_READS);
-        flameL = byte(flameTotalL / FLAME_READS);
+        flameSensor = byte(flameTotal / FLAME_READS);
         if(!flameCalibration){
-            offFlameR = flameR;
-            offFlameL = flameL;
+            offFlame = flameSensor;
             flameCalibration = true;
         }
         // flame status
-        if(flameR > (offFlameR + FLAME_THRESHOLD)){ flameStatusR = true; }else{ flameStatusR = false; }
-        if(flameL > (offFlameL + FLAME_THRESHOLD)){ flameStatusL = true; }else{ flameStatusL = false; }   
-        if(flameStatusR && flameStatusL){ // if both true fire is on
+        if(flameSensor > (offFlame + FLAME_THRESHOLD)){ flameStatus = true; }else{ flameStatus = false; }
+        if(flameStatus){ // if true fire is on
           fireState = true;
         }else{
           fireState = false;
         }
         lastCheckFlame = millis();
+        Serial.print("flame: ");
+        Serial.println(flameSensor);
     }
 }
 
@@ -143,10 +140,11 @@ void Roast::safetyCheck(){
 void Roast::loop_(){
     // update temps  
     updateThermos();
-    // update flame sensors
-    updateFlameSensors();
-    // safety check
-    safetyCheck();
+    if(!FLAME_SENSOR_BYPASS){
+      // update flame sensors
+      updateFlameSensors();r      // safety check
+      safetyCheck();
+    }
 }
 
 

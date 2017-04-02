@@ -29,17 +29,14 @@ class Roast
         int proPercent;
 
         // flame sensors
-        byte flameR;
-        byte flameL;
-        byte offFlameR;
-        byte offFlameL;
+        byte flameSensor;
+        byte offFlame;
         byte rState;
         byte proValve;
         
         // flame variables
         boolean fireState;
-        boolean flameStatusL;
-        boolean flameStatusR;
+        boolean flameStatus;
         boolean flameCalibration;
 
         // Booleans for relay states
