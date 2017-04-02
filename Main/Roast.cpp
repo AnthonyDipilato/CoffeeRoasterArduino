@@ -7,13 +7,13 @@
 #include "Arduino.h"
 #include "Roast.h"
 #include "Configuration.h"
-#include <max6675.h>
+#include "Adafruit_MAX31855.h"
 
 
 // Set pins and initialize thermocouples (CLK, CS, SO)
-MAX6675 chamber_thermo(THERMO_CHAMBER_CLK, THERMO_CHAMBER_CS, THERMO_CHAMBER_SO);
-MAX6675 exhaust_thermo(THERMO_EXHAUST_CLK, THERMO_EXHAUST_CS, THERMO_EXHAUST_SO);
-MAX6675 drum_thermo(THERMO_DRUM_CLK, THERMO_DRUM_CS, THERMO_DRUM_SO);
+Adafruit_MAX31855 chamber_thermo(THERMO_CHAMBER_CLK, THERMO_CHAMBER_CS, THERMO_CHAMBER_SO);
+Adafruit_MAX31855 exhaust_thermo(THERMO_EXHAUST_CLK, THERMO_EXHAUST_CS, THERMO_EXHAUST_SO);
+Adafruit_MAX31855 drum_thermo(THERMO_DRUM_CLK, THERMO_DRUM_CS, THERMO_DRUM_SO);
 
 Roast::Roast(int test){
     // first we will get fire sensor readings
@@ -99,8 +99,6 @@ void Roast::updateFlameSensors(){
           fireState = false;
         }
         lastCheckFlame = millis();
-        Serial.print("flame: ");
-        Serial.println(flameSensor);
     }
 }
 
@@ -142,7 +140,7 @@ void Roast::loop_(){
     updateThermos();
     if(!FLAME_SENSOR_BYPASS){
       // update flame sensors
-      updateFlameSensors();r      // safety check
+      updateFlameSensors();      // safety check
       safetyCheck();
     }
 }
