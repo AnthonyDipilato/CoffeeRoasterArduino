@@ -18,7 +18,7 @@ class Roast
         void setProValve(int percent);
         void toggleRelay(int relay, boolean state);
         void updateThermos();
-        void updateFlameSensors();
+        void updateFlameSensor();
         void safetyCheck();
         
         // we don't need decimal percision for temps, so going with int
@@ -27,17 +27,12 @@ class Roast
         unsigned int exhaustTemp;
 
         int proPercent;
+        int lastFlameState;
+        boolean flameStatus;
 
-        // flame sensors
-        byte flameSensor;
-        byte offFlame;
         byte rState;
         byte proValve;
         
-        // flame variables
-        boolean fireState;
-        boolean flameStatus;
-        boolean flameCalibration;
 
         // Booleans for relay states
         boolean ignitorState;

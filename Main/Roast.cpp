@@ -11,26 +11,24 @@
 
 
 // Set pins and initialize thermocouples (CLK, CS, SO)
-Adafruit_MAX31855 chamber_thermo(THERMO_CHAMBER_CLK, THERMO_CHAMBER_CS, THERMO_CHAMBER_SO);
 Adafruit_MAX31855 exhaust_thermo(THERMO_EXHAUST_CLK, THERMO_EXHAUST_CS, THERMO_EXHAUST_SO);
 Adafruit_MAX31855 drum_thermo(THERMO_DRUM_CLK, THERMO_DRUM_CS, THERMO_DRUM_SO);
+Adafruit_MAX31855 chamber_thermo(THERMO_CHAMBER_CLK, THERMO_CHAMBER_CS, THERMO_CHAMBER_SO);
 
 Roast::Roast(int test){
     // first we will get fire sensor readings
     // this will calibrate our off threshold since outside lighting will alter the reading
-    flameSensor = 0;
     lastCheck = 0;
     lastCheckFlame = 0;
     proValve = 0;
     proPercent = 0;
-    flameCalibration = false;
     // Booleans for relay states
     ignitorState =      false;
     gasValveState =     false;
     coolingFanState =   false;
     exhaustFanState =   false;
     drumState =         false;
-    fireState =         false;
+    flameStatus = false;
 }
 
 void Roast::setProValve(int percent){
@@ -40,9 +38,9 @@ void Roast::setProValve(int percent){
     if(percent == 0){
       value = 0;
     }else{
-      // input is percentage so we will convert it to 0-255 byte
-      int minOffset = 255 - PWM_MIN;
-      value = (((float) percent / 100) * minOffset) + PWM_MIN;
+      percent = ( (100 - PWM_MIN) * ((float) percent/100)) + PWM_MIN;
+      // input is percentage so we will convert it to 0-255 byte;
+      value = ((float) percent / 100) * 255;
     }
     proPercent = percent;
     proValve = (byte) value;
@@ -77,30 +75,29 @@ void Roast::toggleRelay(int relay, boolean state){
     }
 }
 
-// Update Flamer Sensor readings
-void Roast::updateFlameSensors(){
-    int flameTotal = 0;
-    if(millis() > (lastCheckFlame + FLAME_DELAY)){
-        // loop of reads for smoothing
-        for(int i=0; i<FLAME_READS; i++){
-            flameTotal += analogRead(FLAME_SENSOR);
-        }
-        // convert to byte 0-255 also rounds value
-        flameSensor = byte(flameTotal / FLAME_READS);
-        if(!flameCalibration){
-            offFlame = flameSensor;
-            flameCalibration = true;
-        }
-        // flame status
-        if(flameSensor > (offFlame + FLAME_THRESHOLD)){ flameStatus = true; }else{ flameStatus = false; }
-        if(flameStatus){ // if true fire is on
-          fireState = true;
-        }else{
-          fireState = false;
-        }
-        lastCheckFlame = millis();
+
+void Roast::updateFlameSensor(){
+  int flameReading = digitalRead(FLAME_SENSOR);
+  if (flameReading != lastFlameState) {
+    // reset the debouncing timer
+    lastCheckFlame = millis();
+  }
+  if ((millis() - lastCheckFlame) > DEBOUNCE_DELAY) {
+    // whatever the reading is at, it's been there for longer
+    // than the debounce delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (flameReading == 1) {
+      flameStatus = false;
+    }else{
+      flameStatus = true;
     }
+    //Serial.print("Flame: ");
+    //Serial.println(flameStatus);
+  }
+  lastFlameState = flameReading;
 }
+
 
 void Roast::updateThermos(){
     if(millis() > lastCheck + TEMP_DELAY){
@@ -121,16 +118,18 @@ void Roast::updateThermos(){
 // if it fails to ignite shut off main gas valve
 void Roast::safetyCheck(){
     // if ignitor is running check time
-    if(ignitorState && !fireState){ 
+    if(ignitorState && !flameStatus){ 
         if(millis() > (ignitorStart + IGNITION_TIME)){ // shut off gas
+            //Serial.println("Safety Shutoff.");
             toggleRelay(RELAY_GAS, false);
             toggleRelay(RELAY_IGNITOR, false);
         }
     // ignitor on, fire on
-    }else if(ignitorState && fireState){
+    }else if(ignitorState && flameStatus){
           toggleRelay(RELAY_IGNITOR, false);
     // ignitor off, gas on, fire off
-    }else if(!ignitorState && gasValveState && proValve > 0 && !fireState){
+    }else if(!ignitorState && gasValveState && proValve > 0 && !flameStatus
+    ){
           toggleRelay(RELAY_IGNITOR, true);
     }
 }
@@ -138,9 +137,8 @@ void Roast::safetyCheck(){
 void Roast::loop_(){
     // update temps  
     updateThermos();
+    updateFlameSensor();
     if(!FLAME_SENSOR_BYPASS){
-      // update flame sensors
-      updateFlameSensors();      // safety check
       safetyCheck();
     }
 }

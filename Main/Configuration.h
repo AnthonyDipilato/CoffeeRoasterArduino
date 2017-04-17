@@ -15,25 +15,27 @@
 #define RELAY_GAS             5
 #define RELAY_IGNITOR         6
 // Flame Sensors
-#define FLAME_SENSOR        A1
+#define FLAME_SENSOR          50
 // Thermos
 // Drum
-#define THERMO_DRUM_CLK       31
-#define THERMO_DRUM_CS        33
-#define THERMO_DRUM_SO        35
+#define THERMO_DRUM_CLK       37
+#define THERMO_DRUM_CS        39
+#define THERMO_DRUM_SO        41
 // Exhaust
-#define THERMO_EXHAUST_CLK    37
-#define THERMO_EXHAUST_CS     39
-#define THERMO_EXHAUST_SO     41
+#define THERMO_EXHAUST_CLK    31
+#define THERMO_EXHAUST_CS     33
+#define THERMO_EXHAUST_SO     35
 // Chamber
 #define THERMO_CHAMBER_CLK    43
 #define THERMO_CHAMBER_CS     45
 #define THERMO_CHAMBER_SO     47
 // Proportional Valve
+#define H_BRIDGE_1            52
+#define H_BRIDGE_2            53
 #define PRO_VALVE             11
 // Minimum gas setting before flame goes out, used to minimize the chance of flame out.
-// !80% PWM is lowest so a value of 
- #define PWM_MIN               200     
+// 60% PWM is lowest so a value of 
+ #define PWM_MIN               85     
 
 // Flame Safety Settings
 #define FLAME_SENSOR_BYPASS   true
@@ -44,7 +46,7 @@
 #define TEMP_DELAY            500
 #define FLAME_DELAY           500
 // Debounce delay for checking buttons
-#define DEBOUNCE_DELAY        50
+#define DEBOUNCE_DELAY        100
 // Command Addresses
 // Relays
 

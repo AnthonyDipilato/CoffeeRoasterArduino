@@ -43,6 +43,8 @@ int index = 0;
 Roast roast(0);
 
 void setup() {
+    // Set pwm frequency, default settings cause valve to hum act unpredictably. 
+    TCCR1B = (TCCR1B & 0b11111000) | 0x02; // timer 1 acts on pins 11 and 12
     // Serial output for debugging
     Serial.begin(9600);
     // Pin mode for relays
@@ -52,6 +54,8 @@ void setup() {
     pinMode(RELAY_GAS,      OUTPUT);
     pinMode(RELAY_IGNITOR,  OUTPUT);
     pinMode(PRO_VALVE,      OUTPUT);
+    pinMode(H_BRIDGE_1,     OUTPUT);
+    pinMode(H_BRIDGE_2,     OUTPUT);
     // Flame sensors
     pinMode(FLAME_SENSOR, INPUT);
     // Initialize relays (HIGH is off)
@@ -60,6 +64,13 @@ void setup() {
     digitalWrite(RELAY_EXHAUST, HIGH);
     digitalWrite(RELAY_GAS,     HIGH);
     digitalWrite(RELAY_IGNITOR, HIGH);
+    // Too lazy to solder a TIP120 to control the valve 
+    // when I could just use a $5 H-Bridge that's preassembled.
+    // The L298N also has a built in 5v regulator that we can use to power the arduino.
+    // H_BRIDGE_1 and H_BRIDGE_2 control "direction" and PRO_VALVE pin for pwm
+    // Valve is rated 10v but not problems with 12v
+    digitalWrite(H_BRIDGE_1,    LOW);
+    digitalWrite(H_BRIDGE_2,    HIGH);
     // Proportional valve uses analog (PWM)
     // TODO change pwm frequency
     analogWrite(PRO_VALVE, 0);
@@ -198,7 +209,7 @@ void getStatus(int item){
             value = (int) roast.exhaustTemp;
             break;
         case(4):
-            value = (int) roast.fireState;
+            value = (int) roast.flameStatus;
             break;
         case(5):
             value = (int) roast.drumState;
@@ -219,7 +230,7 @@ void getStatus(int item){
             value = (int) roast.proPercent;
             break;
         case(11):
-            value = (int) roast.flameSensor;
+            value = (int) roast.flameStatus;
             break;
     }
     sprintf(output,"0,%d,%d",item,value);
