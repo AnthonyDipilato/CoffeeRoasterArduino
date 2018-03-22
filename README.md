@@ -1,5 +1,5 @@
 # Coffee Roaster
-![Coffee Roaster](http://anthonydipilato.com/wp-content/uploads/2018/03/roaster.jpg)
+![Coffee Roaster](http://anthonydipilato.com/wp-content/uploads/2018/03/roaster-1.jpg)
 
 This project is the arduino code for the coffee roaster that I built.
 You can see the build log and details for the project at [http://anthonydipilato.com/2016/08/11/coffee-roaster/](http://anthonydipilato.com/2016/08/11/coffee-roaster/)
